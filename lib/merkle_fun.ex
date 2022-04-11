@@ -3,24 +3,34 @@ defmodule MerkleFun do
     build_tree(input)
   end
 
-  def combine(a, b), do: hash(a <> b)
+  def root(tree) do
+    elem(tree, 0)
+  end
 
-  def build_tree(data) do
+  defp build_tree(data) do
     leaves = data
+           |> Enum.map(&hash/1)
            |> Enum.sort
-           |> Enum.map(fn x ->  hash(x) end)
 
-    _build_tree(leaves, nil)
+    _build_tree(leaves, [])
+    |> List.to_tuple
   end
 
-  def _build_tree([], root), do: root
-  def _build_tree([a, b | rest], root) do
-    new_hash = combine(a, b)
+  defp _build_tree([root], acc), do: [root | acc]
+  defp _build_tree(level, acc) do
+    new_level = level
+    |> Enum.chunk_every(2)
+    |> Enum.map(fn
+      [x] -> x
+      [x, y] -> combine(x, y)
+    end)
 
-    _build_tree(rest, root)
+    _build_tree(new_level, level ++ acc)
   end
 
-  def hash(data) do
+  defp combine(a, b), do: hash(a <> b)
+
+  defp hash(data) do
     data
     |> String.upcase()
     |> Base.decode16!()
