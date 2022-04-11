@@ -24,11 +24,11 @@ defmodule MerkleFunTest do
   test ".new - with 3 leaves" do
     expected = {
       "d8458a9d64fe8b0d8ede527319e148b5edd58a8a106146e3007db26e43395c8c",
-      "bafc1ea468d5bc155816f3d1bf6b3494328bf5f016ad4203bcad83ef3a558f59",
-      "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3",
-      "486ff72ab227b5f0045d8ab464278dab0b184b24701edce8dd77ff506bfeac71",
-      "d8ad60fcef514b5fb0f2001e8a3b3912de1b4876dd659d75174136ad31b9dae5",
-      "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3"
+         "bafc1ea468d5bc155816f3d1bf6b3494328bf5f016ad4203bcad83ef3a558f59",
+         "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3",
+            "486ff72ab227b5f0045d8ab464278dab0b184b24701edce8dd77ff506bfeac71",
+            "d8ad60fcef514b5fb0f2001e8a3b3912de1b4876dd659d75174136ad31b9dae5",
+            "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3"
     }
 
     assert MerkleFun.new(@three_addresses) === expected
@@ -50,5 +50,15 @@ defmodule MerkleFunTest do
     }
 
     assert MerkleFun.new(@five_addresses) === expected
+  end
+
+  test ".proof - with 3 leaves" do
+    expected = [
+      "0x486ff72ab227b5f0045d8ab464278dab0b184b24701edce8dd77ff506bfeac71",
+      "0xf843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3"
+    ]
+    tree = MerkleFun.new(@three_addresses)
+
+    assert MerkleFun.proof(tree, "e85b7e01c94090358Fb294F11f846B6d990516BE") === expected
   end
 end
