@@ -2,20 +2,22 @@ defmodule MerkleFun do
   require Integer
 
   def new(input) do
-    build_tree(input)
+    tree = build_tree(input)
+
+    {tree, length(Tuple.to_list(tree))}
   end
 
   def root(tree) do
     elem(tree, 0)
   end
 
-  def proof(tree, leaf) do
+  def proof({tree, _len} = m, leaf) do
     leaf_hash = hash(leaf)
 
     list_tree = Tuple.to_list(tree)
     idx = Enum.find_index(list_tree, fn l -> l === leaf_hash end)
 
-    _proof(tree, idx)
+    _proof(m, idx)
       |> Enum.map(fn i -> "0x" <> i end)
   end
 
@@ -23,20 +25,17 @@ defmodule MerkleFun do
     []
   end
 
-  defp _proof(tree, idx) do
+  defp _proof({tree, len}, idx) do
     parent_idx = Integer.floor_div(idx-1, 2)
-    sibling_idx = get_sibling_idx(tree, idx)
+    sibling_idx = get_sibling_idx(idx, len)
     proof_node = elem(tree, sibling_idx)
 
     [proof_node | _proof(tree, parent_idx)]
   end
 
-  defp get_sibling_idx(_tree, 0), do: 0
+  defp get_sibling_idx(0, _), do: 0
 
-  defp get_sibling_idx(tree, idx) do
-    list_tree = Tuple.to_list(tree)
-    len = length(list_tree)
-
+  defp get_sibling_idx(idx, len) do
     sibling_idx = if(Integer.is_even(idx)) do
       idx - 1
     else
