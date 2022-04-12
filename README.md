@@ -1,6 +1,19 @@
 # MerkleFun
 
-**TODO: Add description**
+Initial Merkle Tree implementation using the excellent and fast rust-powered ex_keccak library under the hood.
+
+## Design
+
+~ coming soon ~
+
+## Todo's
+* [x] Make tree
+* [x] Make proof
+* [ ] Validate proof
+* [ ] Pretty Print tree
+* [ ] Fast leaf look up
+
+
 
 ## Installation
 
@@ -14,6 +27,10 @@ def deps do
   ]
 end
 ```
+
+## Thanks
+
+Thanks goes out to Rodger Maarfi (@acrite22) for pairing with me on this.
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can

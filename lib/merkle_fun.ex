@@ -4,33 +4,30 @@ defmodule MerkleFun do
   def new(input) do
     tree = build_tree(input)
 
-    {tree, length(Tuple.to_list(tree))}
+    {tree, tuple_size(tree)}
   end
 
-  def root(tree) do
-    elem(tree, 0)
-  end
+  def root({tree, _size}), do: elem(tree, 0)
 
   def proof({tree, _len} = m, leaf) do
     leaf_hash = hash(leaf)
 
-    list_tree = Tuple.to_list(tree)
-    idx = Enum.find_index(list_tree, fn l -> l === leaf_hash end)
+    idx = tree
+          |> Tuple.to_list()
+          |> Enum.find_index(fn l -> l === leaf_hash end)
 
     _proof(m, idx)
       |> Enum.map(fn i -> "0x" <> i end)
   end
 
-  defp _proof(_tree, 0) do
-    []
-  end
+  defp _proof(_tree, 0), do: []
 
-  defp _proof({tree, len}, idx) do
+  defp _proof({tree, len}=m, idx) do
     parent_idx = Integer.floor_div(idx-1, 2)
     sibling_idx = get_sibling_idx(idx, len)
     proof_node = elem(tree, sibling_idx)
 
-    [proof_node | _proof(tree, parent_idx)]
+    [proof_node | _proof(m, parent_idx)]
   end
 
   defp get_sibling_idx(0, _), do: 0
@@ -41,26 +38,13 @@ defmodule MerkleFun do
     else
       idx + 1
     end
+
     if(sibling_idx > len) do
       idx
     else
       sibling_idx
     end
   end
-
-  # defp _verify(tree, idx) do
-  #   IO.inspect "proof +1"
-  #   node = elem(tree, idx)
-  #   sibling = get_sibling(tree, idx)
-  #   parent = if(Integer.is_even(idx)) do
-  #     combine(sibling, node)
-  #   else
-  #     combine(node, sibling)
-  #   end
-
-  #   parent_idx = Integer.floor_div(idx-1, 2)
-  #   [parent | _proof(tree, parent_idx)]
-  # end
 
   defp build_tree(data) do
     leaves = data
