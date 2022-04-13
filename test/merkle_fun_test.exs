@@ -108,4 +108,52 @@ defmodule MerkleFunTest do
     assert MerkleFun.proof(mt, b) === b_expected
     assert MerkleFun.proof(mt, c) === c_expected
   end
+
+  test ".proof - with 7 leaves" do
+    a_expected = [
+      "0x0e812e91ffbecace4dd96070cf2a3ae3ccfa4cabcd5b5521a6631b64feeeb5e7",
+      "0xdd46f9887cc3e2bf747ba7c44088af72afb7e7ef8a9979aa46bd2d8bba27eccc",
+      "0x32dc8ca919f2d035e7f16dcde4a27643ec570605d81dc0fe025f55eeb1591dcf"
+    ]
+    b_expected =  [
+      "0xb19babd29e7815b696f28283e6ac98b9ac6f765ac5e2c3d7242fcdb9bb52a3e4",
+      "0x765fef4f7022a8741f699b8601560d7bb1fcd3fd18ef356bf0558a34c618723b"
+    ]
+    c_expected = [
+      "0x6772a13d0dc3e75fdc0e39d1f6810ce673fc00495c0544aa8e39f09a35ab4770",
+      "0x6ea40cfb86421f8e6264f14be34afa63efd4b6bd03d17687d803fa604bc8c4d5",
+      "0x32dc8ca919f2d035e7f16dcde4a27643ec570605d81dc0fe025f55eeb1591dcf"
+    ]
+    d_expected = [
+      "0xe661403df734ea32520cf963848afaf7fd07cd92765eb51a3d611f4bdc4a8073",
+      "0xfb800734b01c1c5c1d15e4b79bf150c335fb7f93554e92ebb452a09440a6f5e5",
+      "0x765fef4f7022a8741f699b8601560d7bb1fcd3fd18ef356bf0558a34c618723b"
+    ]
+    e_expected = [
+      "0xb1602e2aab98d8de4e719cd1f574bde135dae520a74b2d41d441ccef5e3f037e",
+      "0xfb800734b01c1c5c1d15e4b79bf150c335fb7f93554e92ebb452a09440a6f5e5",
+      "0x765fef4f7022a8741f699b8601560d7bb1fcd3fd18ef356bf0558a34c618723b"
+    ]
+    f_expected = [
+      "0x114dfe5ced5f046afff8bd1e24f55b3423eff53de2ef131e3c2218266edf2a55",
+      "0xdd46f9887cc3e2bf747ba7c44088af72afb7e7ef8a9979aa46bd2d8bba27eccc",
+      "0x32dc8ca919f2d035e7f16dcde4a27643ec570605d81dc0fe025f55eeb1591dcf"
+    ]
+    g_expected = [
+      "0x52a78285a25d74e30043be50c247c58c402e121312ed596deabafba40c2dc667",
+      "0x6ea40cfb86421f8e6264f14be34afa63efd4b6bd03d17687d803fa604bc8c4d5",
+      "0x32dc8ca919f2d035e7f16dcde4a27643ec570605d81dc0fe025f55eeb1591dcf"
+    ]
+
+    [a, b, c, d, e, f, g] = @seven_addresses
+    mt = MerkleFun.new(@seven_addresses)
+
+    assert MerkleFun.proof(mt, a) === a_expected
+    assert MerkleFun.proof(mt, b) === b_expected
+    assert MerkleFun.proof(mt, c) === c_expected
+    assert MerkleFun.proof(mt, d) === d_expected
+    assert MerkleFun.proof(mt, e) === e_expected
+    assert MerkleFun.proof(mt, f) === f_expected
+    assert MerkleFun.proof(mt, g) === g_expected
+  end
 end
