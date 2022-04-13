@@ -12,55 +12,92 @@ defmodule MerkleFun do
   def print({tree, _size}) do
     tree
     |> Tuple.to_list()
+    |> Enum.reject(fn x -> x == 1 end)
     |> Enum.map(&bytes_to_string/1)
   end
 
   def proof({tree, _} = mt, leaf) do
-    leaf_hash = leaf
-                |> Base.decode16!(case: :mixed)
-                |> hash()
+    leaf_hash =
+      leaf
+      |> Base.decode16!(case: :mixed)
+      |> hash()
 
-    idx = tree
-          |> Tuple.to_list()
-          |> Enum.find_index(fn l -> l === leaf_hash end)
+    idx =
+      tree
+      |> Tuple.to_list()
+      |> Enum.find_index(fn l -> l === leaf_hash end)
 
     _proof(mt, idx)
-      |> Enum.map(&bytes_to_string/1)
-      |> Enum.map(&add_0x/1)
+    |> Enum.map(&bytes_to_string/1)
+    |> Enum.map(&add_0x/1)
   end
 
   defp _proof(_tree, 0), do: []
 
-  defp _proof({tree, _}=mt, idx) do
-    parent_idx = Integer.floor_div(idx - 1, 2)
+  defp _proof({tree, _len} = mt, idx) do
     sibling_idx = get_sibling_idx(idx)
     proof_node = elem(tree, sibling_idx)
+
+    parent_idx = Integer.floor_div(idx - 1, 2)
 
     [proof_node | _proof(mt, parent_idx)]
   end
 
   defp build_tree(data) do
-    leaves = data
-             |> Enum.map(fn x -> Base.decode16!(x, case: :mixed) end)
-             |> Enum.map(&hash/1)
-             |> Enum.sort
+    leaves =
+      data
+      |> Enum.map(fn x -> Base.decode16!(x, case: :mixed) end)
+      |> Enum.map(&hash/1)
+      |> Enum.sort()
 
-    _build_tree(leaves, []) |> List.to_tuple
+    tree = _build_tree(leaves, [])
+
+    {_, padded_tree} =
+      Enum.reduce(tree, {1, []}, fn row, {num, rows} ->
+        padded_row = pad_row(num, row)
+        {num * 2, [padded_row | rows]}
+      end)
+
+    padded_tree
+    |> Enum.reverse()
+    |> List.flatten()
+    |> List.to_tuple()
   end
 
-  defp _build_tree([root], acc), do: [root | acc]
+  defp pad_row(num, row) do
+    true_len = length(row)
+
+    if num == 1 || true_len == num do
+      row
+    else
+      add_amount = num - true_len
+      # pad using 1, takes less space than nil
+      padding = List.duplicate(1, add_amount)
+      row ++ padding
+    end
+  end
+
+  defp _build_tree([root], acc), do: [[root] | acc]
+
   defp _build_tree(level, acc) do
-    new_level = level
-    |> Enum.chunk_every(2)
-    |> Enum.map(fn
-      [x] -> x
-      [x, y] -> combine(x, y)
-    end)
+    new_level =
+      level
+      |> Enum.chunk_every(2)
+      |> Enum.map(fn
+        [x] -> x
+        [x, y] -> combine(x, y)
+      end)
 
-    _build_tree(new_level, level ++ acc)
+    _build_tree(new_level, [level | acc])
   end
 
-  defp combine(a, b), do: hash(a <> b)
+  defp combine(a, b) do
+    if(a == b) do
+      a
+    else
+      hash(a <> b)
+    end
+  end
 
   defp hash(data), do: data |> ExKeccak.hash_256()
 
