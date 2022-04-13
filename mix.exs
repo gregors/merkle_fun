@@ -6,7 +6,7 @@ defmodule MerkleFun.MixProject do
   def project do
     [
       app: :merkle_fun,
-      version: "0.1.0",
+      version: "0.2.0",
       description: "Merkle Tree implementation",
       name: "Merkle Fun",
       package: package(),
