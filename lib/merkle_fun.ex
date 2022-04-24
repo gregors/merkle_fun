@@ -33,7 +33,7 @@ defmodule MerkleFun do
   defp _proof(_, 0), do: []
 
   defp _proof(tree, idx) do
-    sibling_idx = get_sibling_idx(idx)
+    sibling_idx = sibling_idx(idx)
     node = elem(tree, sibling_idx)
 
     parent_idx = Integer.floor_div(idx - 1, 2)
@@ -69,7 +69,7 @@ defmodule MerkleFun do
 
   defp hash(data), do: data |> ExKeccak.hash_256()
 
-  defp get_sibling_idx(idx) do
+  defp sibling_idx(idx) do
     if Integer.is_even(idx) do
       idx - 1
     else
