@@ -1,0 +1,32 @@
+# Elixir CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+version: 2.1
+orbs:
+  rust: circleci/rust@1.6.0
+jobs:
+  build:
+    docker:
+      - image: cimg/elixir:1.13.2
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ checksum "mix.lock" }}
+
+      - rust/install
+      - run: mix do deps.get, compile
+      - run: MIX_ENV=test mix do deps.get, compile
+
+      - save_cache:  # generate and store mix cache
+          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          paths:
+            - "deps"
+            - "_build"
+
+      - run: mix test
