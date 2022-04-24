@@ -3,6 +3,8 @@
 [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree) implementation using the excellent and fast rust-powered ex_keccak library under the hood.
 If you'd like to know more about the basic algorithm, check out this great [introductory talk](https://youtu.be/HdGpG0kcEGU?t=132).
 
+[![CircleCI](https://circleci.com/gh/gregors/merkle_fun/tree/main.svg?style=svg)](https://circleci.com/gh/gregors/merkle_fun/tree/main)
+
 ## Installation
 
 The package can be installed
