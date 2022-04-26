@@ -29,7 +29,7 @@ defmodule MerkleFunTest do
       "d8ad60fcef514b5fb0f2001e8a3b3912de1b4876dd659d75174136ad31b9dae5"
     ]
 
-    mt = MerkleFun.new(@addresses)
+    mt = MerkleFun.new(@addresses, false)
     assert MerkleFun.print(mt) === expected
   end
 
@@ -43,7 +43,7 @@ defmodule MerkleFunTest do
       "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3"
     ]
 
-    mt = MerkleFun.new(@three_addresses)
+    mt = MerkleFun.new(@three_addresses, false)
     assert MerkleFun.print(mt) === expected
   end
 
@@ -62,7 +62,7 @@ defmodule MerkleFunTest do
       "f843099e9ca3770bb7fec2b13d9c2aa355edff986ff294eeb9eee0fc24a1f6a3"
     ]
 
-    mt = MerkleFun.new(@five_addresses)
+    mt = MerkleFun.new(@five_addresses, false)
     assert MerkleFun.print(mt) === expected
   end
 
@@ -84,7 +84,7 @@ defmodule MerkleFunTest do
       "fb800734b01c1c5c1d15e4b79bf150c335fb7f93554e92ebb452a09440a6f5e5"
     ]
 
-    mt = MerkleFun.new(@seven_addresses)
+    mt = MerkleFun.new(@seven_addresses, false)
     assert MerkleFun.print(mt) === expected
   end
 
@@ -102,7 +102,7 @@ defmodule MerkleFunTest do
     ]
 
     [a, b, c] = @three_addresses
-    mt = MerkleFun.new(@three_addresses)
+    mt = MerkleFun.new(@three_addresses, false)
 
     assert MerkleFun.proof(mt, a) === a_expected
     assert MerkleFun.proof(mt, b) === b_expected
@@ -152,7 +152,7 @@ defmodule MerkleFunTest do
     ]
 
     [a, b, c, d, e, f, g] = @seven_addresses
-    mt = MerkleFun.new(@seven_addresses)
+    mt = MerkleFun.new(@seven_addresses, false)
 
     assert MerkleFun.proof(mt, a) === a_expected
     assert MerkleFun.proof(mt, b) === b_expected
@@ -185,10 +185,83 @@ defmodule MerkleFunTest do
       data
       |> String.split()
       |> Enum.map(fn "0x" <> address -> address end)
-      |> MerkleFun.new()
+      |> MerkleFun.new(false)
       # |> :erlang.term_to_binary() |> :erlang.byte_size() |> IO.inspect
       |> MerkleFun.proof("8a4f26aa310cfaa0bfb679572bac264e10b83b7b")
 
     assert proof == expected
+  end
+
+  test "big test with sort_pairs true" do
+    expected = [
+      "0x11481edda7910f8b360477264c7d95efdbbd6c54865b037826116f1381be931c",
+      "0xff95de80beb93f114e513fde55bb56aaf97235b88538e44868386fde8ccdd332",
+      "0x8b408b46a623e32f2d96cfddf9dbe99ece434616176c88fcaf83b95400990c9c",
+      "0x711df83502fe376affc81def0dacb0c354ddacf313d35134881865090e1aab66",
+      "0xc50e421beac2d414510dd59f47b0829843502d6211efbf44bf646ab55dfcbe63",
+      "0x4bd7da6474a9a11f23785813f45d17b071adcfca90eaa75acd8d6681b36043c4",
+      "0xd7c0e82767f18af286de2fc77e2a9d0408416e7f9fc5420fa9857de2a8a40beb",
+      "0xabbd063305cbe687947d2ab1583b3ee7632e7f859670d1860fb852218acd55a7",
+      "0x30d6b69032f99428c2c18813d0a0e9ce802c0588075089932572523a5194bc3c",
+      "0xe8ee275983513bbb8ad9ba5d17b3817d613dbf6c6d914890c362630789f7fe48",
+      "0x2b31006dff42227673762c27fbeb7fdc3185b3858ab6c32246bb778085a1a8a2",
+      "0x6c92684194cc4f51a8a916b59766700aa7067fa574c34be23671ce9f2380c1bd"
+    ]
+
+    {:ok, data} = File.read("./test/test_addresses.txt")
+
+    proof =
+      data
+      |> String.split()
+      |> Enum.map(fn "0x" <> address -> address end)
+      |> MerkleFun.new(sort_pairs: true)
+      |> MerkleFun.proof("8a4f26aa310cfaa0bfb679572bac264e10b83b7b")
+
+    assert proof == expected
+  end
+
+
+  test ".verify/2 should verify a valid proof with sort_pairs true" do
+    proof = [
+      "0x11481edda7910f8b360477264c7d95efdbbd6c54865b037826116f1381be931c",
+      "0xff95de80beb93f114e513fde55bb56aaf97235b88538e44868386fde8ccdd332",
+      "0x8b408b46a623e32f2d96cfddf9dbe99ece434616176c88fcaf83b95400990c9c",
+      "0x711df83502fe376affc81def0dacb0c354ddacf313d35134881865090e1aab66",
+      "0xc50e421beac2d414510dd59f47b0829843502d6211efbf44bf646ab55dfcbe63",
+      "0x4bd7da6474a9a11f23785813f45d17b071adcfca90eaa75acd8d6681b36043c4",
+      "0xd7c0e82767f18af286de2fc77e2a9d0408416e7f9fc5420fa9857de2a8a40beb",
+      "0xabbd063305cbe687947d2ab1583b3ee7632e7f859670d1860fb852218acd55a7",
+      "0x30d6b69032f99428c2c18813d0a0e9ce802c0588075089932572523a5194bc3c",
+      "0xe8ee275983513bbb8ad9ba5d17b3817d613dbf6c6d914890c362630789f7fe48",
+      "0x2b31006dff42227673762c27fbeb7fdc3185b3858ab6c32246bb778085a1a8a2",
+      "0x6c92684194cc4f51a8a916b59766700aa7067fa574c34be23671ce9f2380c1bd"
+    ]
+
+    address = "8a4f26aa310cfaa0bfb679572bac264e10b83b7b"
+
+    known_good_merkle_root = "0x4242acf1a9e8c6d15aca29180c30388bb3fb505f79aac4d03a88e4bf7bbf7fc3"
+    assert MerkleFun.verify(proof, address) == known_good_merkle_root
+  end
+
+  test ".verify/3 should verify a valid proof with sort_pairs true" do
+    proof = [
+      "0x11481edda7910f8b360477264c7d95efdbbd6c54865b037826116f1381be931c",
+      "0xff95de80beb93f114e513fde55bb56aaf97235b88538e44868386fde8ccdd332",
+      "0x8b408b46a623e32f2d96cfddf9dbe99ece434616176c88fcaf83b95400990c9c",
+      "0x711df83502fe376affc81def0dacb0c354ddacf313d35134881865090e1aab66",
+      "0xc50e421beac2d414510dd59f47b0829843502d6211efbf44bf646ab55dfcbe63",
+      "0x4bd7da6474a9a11f23785813f45d17b071adcfca90eaa75acd8d6681b36043c4",
+      "0xd7c0e82767f18af286de2fc77e2a9d0408416e7f9fc5420fa9857de2a8a40beb",
+      "0xabbd063305cbe687947d2ab1583b3ee7632e7f859670d1860fb852218acd55a7",
+      "0x30d6b69032f99428c2c18813d0a0e9ce802c0588075089932572523a5194bc3c",
+      "0xe8ee275983513bbb8ad9ba5d17b3817d613dbf6c6d914890c362630789f7fe48",
+      "0x2b31006dff42227673762c27fbeb7fdc3185b3858ab6c32246bb778085a1a8a2",
+      "0x6c92684194cc4f51a8a916b59766700aa7067fa574c34be23671ce9f2380c1bd"
+    ]
+
+    address = "8a4f26aa310cfaa0bfb679572bac264e10b83b7b"
+
+    known_good_merkle_root = "0x4242acf1a9e8c6d15aca29180c30388bb3fb505f79aac4d03a88e4bf7bbf7fc3"
+    assert MerkleFun.verify(proof, address, known_good_merkle_root) == true
   end
 end
