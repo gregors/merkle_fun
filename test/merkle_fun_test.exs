@@ -88,6 +88,22 @@ defmodule MerkleFunTest do
     assert MerkleFun.print(mt) === expected
   end
 
+  test ".new - with 0x prefix - strips prefix" do
+    addresses = [
+      "0xe85b7e01c94090358Fb294F11f846B6d990516BE",
+      "0XbcD34a4908eAfD3e16b08809FA9557357bF12F09"
+    ]
+
+    expected = [
+      "bafc1ea468d5bc155816f3d1bf6b3494328bf5f016ad4203bcad83ef3a558f59",
+      "486ff72ab227b5f0045d8ab464278dab0b184b24701edce8dd77ff506bfeac71",
+      "d8ad60fcef514b5fb0f2001e8a3b3912de1b4876dd659d75174136ad31b9dae5"
+    ]
+
+    mt = MerkleFun.new(addresses, false)
+    assert MerkleFun.print(mt) === expected
+  end
+
   test ".proof - with 3 leaves" do
     a_expected = ["0xbafc1ea468d5bc155816f3d1bf6b3494328bf5f016ad4203bcad83ef3a558f59"]
 
@@ -163,6 +179,21 @@ defmodule MerkleFunTest do
     assert MerkleFun.proof(mt, g) === g_expected
   end
 
+  test ".proof - dont include placeholder nodes" do
+    {:ok, addresses} = File.read("./test/test_addresses_22.txt")
+
+    addresses =
+      addresses
+      |> String.split()
+
+    address = "14faF04f4383CC5b2198056b1C35b73f22706D08"
+    mt = MerkleFun.new(addresses)
+
+    proof = MerkleFun.proof(mt, address)
+
+    assert Enum.any?(proof, fn p -> "0x1" === p end) == false
+  end
+
   test "big test" do
     expected = [
       "0x11481edda7910f8b360477264c7d95efdbbd6c54865b037826116f1381be931c",
@@ -184,7 +215,6 @@ defmodule MerkleFunTest do
     proof =
       data
       |> String.split()
-      |> Enum.map(fn "0x" <> address -> address end)
       |> MerkleFun.new(false)
       # |> :erlang.term_to_binary() |> :erlang.byte_size() |> IO.inspect
       |> MerkleFun.proof("8a4f26aa310cfaa0bfb679572bac264e10b83b7b")
@@ -192,7 +222,7 @@ defmodule MerkleFunTest do
     assert proof == expected
   end
 
-  test "big test with sort_pairs true" do
+  test ".proof - big test with sort_pairs true" do
     expected = [
       "0x11481edda7910f8b360477264c7d95efdbbd6c54865b037826116f1381be931c",
       "0xff95de80beb93f114e513fde55bb56aaf97235b88538e44868386fde8ccdd332",
@@ -213,13 +243,30 @@ defmodule MerkleFunTest do
     proof =
       data
       |> String.split()
-      |> Enum.map(fn "0x" <> address -> address end)
       |> MerkleFun.new(sort_pairs: true)
       |> MerkleFun.proof("8a4f26aa310cfaa0bfb679572bac264e10b83b7b")
 
     assert proof == expected
   end
 
+  test ".verify/3 list of addresses" do
+    {:ok, addresses} = File.read("./test/test_addresses_22.txt")
+
+    addresses =
+      addresses
+      |> String.split()
+      |> Enum.shuffle()
+
+    tree = MerkleFun.new(addresses)
+    root = "0x26143f46ae206acc59f9d4ce11e9be76bae8ce4e0a17f26586764dc5e8c87795"
+
+    results =
+      addresses
+      |> Enum.map(fn address -> {address, MerkleFun.proof(tree, address)} end)
+      |> Enum.any?(fn {address, proof} -> MerkleFun.verify(proof, address, root) end)
+
+    assert results == true
+  end
 
   test ".verify/2 should verify a valid proof with sort_pairs true" do
     proof = [
