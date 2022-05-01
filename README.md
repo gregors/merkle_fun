@@ -22,7 +22,7 @@ end
 
 ### binary tree
 
-There are multiple ways to implement a binary tree. We decided to use an [array format](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/CompleteTree.html) approach to minimize storage requirements and make the sibling lookup easy. If it's been a while since you've done a basic data structures could check out this [refresher](https://www.youtube.com/watch?v=zDlTxrEwxvg).
+There are multiple ways to implement a binary tree. We decided to use an [array format](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/CompleteTree.html) approach to minimize storage requirements and make the sibling lookup easy. If it's been a while since you've done a basic data structures course, check out this [refresher](https://www.youtube.com/watch?v=zDlTxrEwxvg).
 
 Wait a minute you say! Elixir doesn't have arrays? Well there is an [Erlang implementation](https://www.erlang.org/doc/man/array.html) as well as a nice [Elixir library](https://github.com/Qqwy/elixir-arrays). However, after thinking about the problem our use case didn't need updates. We build the tree and don't need to append further nodes. In such a case a tuple suits our [read only needs](https://stackoverflow.com/questions/16447921/arrays-implementation-in-erlang/16464349#16464349) perfectly. If we decide to add Merkle Mountain Ranges (in the future) we will need something with better append performance.
 
@@ -38,7 +38,7 @@ Initial leaf lookup is currently looking through the entire tree. Yeah I need to
 ## Todo's
 * [x] Make tree
 * [x] Make proof
-* [ ] Validate proof
+* [x] Validate proof
 * [ ] Pretty Print tree
 * [ ] Fast leaf look up
 
