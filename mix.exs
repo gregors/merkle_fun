@@ -6,7 +6,7 @@ defmodule MerkleFun.MixProject do
   def project do
     [
       app: :merkle_fun,
-      version: "0.5.0",
+      version: "0.6.0",
       description: "Merkle Tree implementation",
       name: "Merkle Fun",
       package: package(),
@@ -33,9 +33,9 @@ defmodule MerkleFun.MixProject do
 
   defp deps do
     [
-      {:ex_keccak, "~> 0.4.0"},
+      {:ex_keccak, "~> 0.6"},
       {:benchee, "~> 1.0", only: :dev},
-      {:ex_doc, ">= 0.19.0", only: :dev}
+      {:ex_doc, ">= 0.29.0", only: :dev}
     ]
   end
 end
