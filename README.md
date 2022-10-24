@@ -13,7 +13,7 @@ by adding `merkle_fun` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:merkle_fun, "~> 0.3.0"}
+    {:merkle_fun, "~> 0.6.0"}
   ]
 end
 ```
